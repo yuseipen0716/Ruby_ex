@@ -1,4 +1,5 @@
 # coding: utf-8
+
 # Rubyが動作するかテストする
 
 #  "Hello World"を表示する
