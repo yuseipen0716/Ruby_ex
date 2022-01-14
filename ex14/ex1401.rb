@@ -74,11 +74,44 @@ class BookInfoManager
         end
     end
 
+    # 蔵書データを検索する
+    def search
+       # 検索用のインスタンスを生成
+       search_info = BookInfo.new('', '', 0, Date.new)
+       # 検索するデータを項目ごとに入力する
+       print "\n"
+       print '書籍名: '
+       title = gets.chomp
+       search_info.title = title unless title.nil?
+       print '著者名: '
+       author = gets.chomp
+       search_info.author = author unless author.nil?
+       print 'ページ数: '
+       page = gets.chomp.to_i
+       search_info.page = page 
+       print '発刊年: '
+       year = gets.chomp.to_i
+       print '発刊月: '
+       month = gets.chomp.to_i
+       print '発刊日: '
+       day = gets.chomp.to_i
+
+       # 検索用データが蔵書データと一致するか検証
+       @book_infos.each do |key, info|
+           if info.title == search_info.title || info.author == search_info.author || info.page == search_info.page || info.publish_date.year == year || info.publish_date.month == month || info.publish_date.day == day
+               puts '以下の蔵書データが検索条件と一致しました。'
+               puts "\n---------------"
+               puts info.to_formatted_string
+               puts "\n---------------"
+           end
+       end
+    end
+
     # 処理の選択と選択後の処理を繰り返す
     def run
         while true
             # 機能選択画面を表示する
-            print "1. 蔵書データの登録\n2. 蔵書データの表示\n9. 終了\n番号を選んでください(1,2,9): "
+            print "1. 蔵書データの登録\n2. 蔵書データの表示\n4. 蔵書データを検索\n9. 終了\n番号を選んでください(1,2,9): "
             
             # 文字の入力を待つ
             num = gets.chomp
@@ -89,6 +122,9 @@ class BookInfoManager
             when '2'
                 # 蔵書データの表示
                 list_all_bookinfos
+            when '4'
+                # 蔵書データの検索
+                search
             when '9'
                 # アプリケーションの終了
                 break
