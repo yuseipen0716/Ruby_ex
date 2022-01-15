@@ -97,13 +97,19 @@ class BookInfoManager
        day = gets.chomp.to_i
 
        # 検索用データが蔵書データと一致するか検証
+       # 検索結果に一致するデータがなかったときにメッセージを出力するためにcounterという変数を定義する。処理終了時にcounter == 0であるなら、一致するデータがなかった旨のメッセージを出力する
+       counter = 0
        @book_infos.each do |key, info|
            if info.title == search_info.title || info.author == search_info.author || info.page == search_info.page || info.publish_date.year == year || info.publish_date.month == month || info.publish_date.day == day
                puts '以下の蔵書データが検索条件と一致しました。'
                puts "\n---------------"
                puts info.to_formatted_string
                puts "\n---------------"
+               counter += 1
            end
+       end
+       if counter == 0
+           puts '検索条件に合致する蔵書データが見つかりませんでした。'
        end
     end
 
