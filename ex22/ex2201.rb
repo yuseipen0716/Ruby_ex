@@ -40,6 +40,7 @@ class BookInfoManager
         # データベースに接続
         config = YAML.load_file(@yaml_file_path)
         ActiveRecord::Base.establish_connection(config['db']['bookinfos'])
+        puts "データベースに接続しました\n"
     end
 
     # 蔵書データベースを初期化する
@@ -51,8 +52,102 @@ class BookInfoManager
         if /^Y$/ =~ yesno
             # Yが1文字の時だけ、初期化を実行する
             Bookinfo.destroy_all
-            puts 'データベースを初期化しました'
+            puts "データベースを初期化しました\n"
+        end
+    end
+
+    # 蔵書データを登録する
+    def add_book_info
+        puts "\n1. 蔵書データの登録"
+        puts '蔵書データを登録します'
+
+        # 蔵書データ1件分のインスタンスを作成する
+        book_info = BookInfo.new('', '', 0, Date.new)
+        # 登録するデータを項目ごとに入力する
+        print '書籍名: '
+        book_info.title = gets.chomp
+        print '著者名: '
+        book_info.author = gets.chomp
+        print 'ページ数: '
+        book_info.page = gets.chomp.to_i
+        print '発刊年: '
+        year = gets.chomp.to_i
+        print '発刊月: '
+        month = gets.chomp.to_i
+        print '発刊日: '
+        day = gets.chomp.to_i
+        book_info.publish_date = Date.new(year, month, day)
+
+        # idを取得
+        
+
+        # 作成した蔵書データをデータベースに登録する
+        Bookinfo.create(
+            # idは1から始まる連番にしたい。（auto_incrementにすればいい話かもだけど)
+            # 最後の蔵書データが存在する場合はそのIDに1を加えたものを今回のidにする
+            # id = 1のデータが存在する場合、という条件で設定していたが、id = 1のレコードを削除していた場合に
+            # 不具合が生じるのでこのようにした。もっといい方法募集中。
+            if Bookinfo.last.exist?
+                id: Bookinfo.last.id + 1,
+            else
+                id: 1,
+            end
+            # ここから下で登録するカラムは上で作成したインスタンスから引っ張ってくる
+            title: book_info.title,
+            author: book_info.author,
+            page: book_info.page,
+            publish_date: book_info.publish_date
+        );
+    end
+
+#     # 蔵書データの一覧を表示する
+#     def list_all_bookinfos
+#         puts "\n2. 蔵書データの表示"
+#         puts "蔵書データを表示します\n---------------"
+
+#         # テーブルからデータを読み込んで表示する
+#         counter = 0
+#         (Bookinfo.first.id..Bookinfo.last.id).each do |id|
+#             puts "id: #{Bookinfo.find_by(id: id).id}"
+#             puts "title: #{Bookinfo.find_by(id: id).title}"
+#             puts "author: #{Bookinfo.find_by(id: id).author}"
+#             puts "page: #{Bookinfo.find_by(id: id).page}"
+#             puts "publish_date: #{Bookinfo.find_by(id: id).publish_date}"
+#             puts '---------------'
+#             counter += 1
+#         end
+#         puts "#{counter}件のデータを表示しました。"
+#     end
+
+#     # 処理の選択と選択後の処理を繰り返す
+    def run
+        while true
+            # 機能選択画面を表示する
+            print "0. 蔵書データベースの初期化\n1. 蔵書データの登録 \n2. 蔵書データの表示 \n9. 終了\n番号を選んでください(0, 1, 2, 9): "
+
+            # 文字の入力を待つ
+            num = gets.chomp
+            case num
+            when '0'
+                # 蔵書データベースの初期化
+                init_bookinfos
+            when '1'
+                # 蔵書データの登録
+                add_book_info
+            when '2'
+                # 蔵書データの表示
+                list_all_bookinfos
+            when '9'
+                # アプリケーションの終了
+                break
+            else
+                # 処理待ち画面に戻る
+                puts '入力された数値が不正です'
+            end
         end
     end
 end
+
+book_info_manager = BookInfoManager.new
+book_info_manager.run
 
