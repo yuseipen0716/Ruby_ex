@@ -79,48 +79,59 @@ class BookInfoManager
         book_info.publish_date = Date.new(year, month, day)
 
         # idを取得
-        
+        # idは1から始まる連番にしたい。（auto_incrementにすればい
+        # 最後の蔵書データが存在する場合はそのIDに1を加えたものを
+        # id = 1のデータが存在する場合、という条件で設定していたが
+        # 不具合が生じるのでこのようにした。もっといい方法募集中。
+        if Bookinfo.exists?
+            id = Bookinfo.last.id + 1
+        else
+            id = 1
+        end
 
-        # 作成した蔵書データをデータベースに登録する
+        # 作成した蔵書データをデータベースに登録する `,`を忘れないように！
         Bookinfo.create(
-            # idは1から始まる連番にしたい。（auto_incrementにすればいい話かもだけど)
-            # 最後の蔵書データが存在する場合はそのIDに1を加えたものを今回のidにする
-            # id = 1のデータが存在する場合、という条件で設定していたが、id = 1のレコードを削除していた場合に
-            # 不具合が生じるのでこのようにした。もっといい方法募集中。
-            if Bookinfo.last.exist?
-                id: Bookinfo.last.id + 1,
-            else
-                id: 1,
-            end
+            id: id,
             # ここから下で登録するカラムは上で作成したインスタンスから引っ張ってくる
             title: book_info.title,
             author: book_info.author,
             page: book_info.page,
             publish_date: book_info.publish_date
         );
+        puts '蔵書データを登録しました'
+        puts ''
     end
 
-#     # 蔵書データの一覧を表示する
-#     def list_all_bookinfos
-#         puts "\n2. 蔵書データの表示"
-#         puts "蔵書データを表示します\n---------------"
+    # 蔵書データの一覧を表示する
+    def list_all_bookinfos
+        puts "\n2. 蔵書データの表示"
+        if Bookinfo.exists?
+            puts "蔵書データを表示します\n---------------"
 
-#         # テーブルからデータを読み込んで表示する
-#         counter = 0
-#         (Bookinfo.first.id..Bookinfo.last.id).each do |id|
-#             puts "id: #{Bookinfo.find_by(id: id).id}"
-#             puts "title: #{Bookinfo.find_by(id: id).title}"
-#             puts "author: #{Bookinfo.find_by(id: id).author}"
-#             puts "page: #{Bookinfo.find_by(id: id).page}"
-#             puts "publish_date: #{Bookinfo.find_by(id: id).publish_date}"
-#             puts '---------------'
-#             counter += 1
-#         end
-#         puts "#{counter}件のデータを表示しました。"
-#     end
+            # テーブルからデータを読み込んで表示する
+            counter = 0
+            (Bookinfo.first.id..Bookinfo.last.id).each do |id|
+                puts "id: #{Bookinfo.find_by(id: id).id}"
+                puts "title: #{Bookinfo.find_by(id: id).title}"
+                puts "author: #{Bookinfo.find_by(id: id).author}"
+                puts "page: #{Bookinfo.find_by(id: id).page}"
+                puts "publish_date: #{Bookinfo.find_by(id: id).publish_date}"
+                puts '---------------'
+                counter += 1
+            end
+            puts "#{counter}件のデータを表示しました。"
+            puts ''
+        else
+            # 1件もレコードがない状態だとerrorがでるため、メッセージを返す
+            puts '蔵書データが存在しません。'
+            puts ''
+        end
+        
+    end
 
-#     # 処理の選択と選択後の処理を繰り返す
+    # 処理の選択と選択後の処理を繰り返す
     def run
+        puts ''
         while true
             # 機能選択画面を表示する
             print "0. 蔵書データベースの初期化\n1. 蔵書データの登録 \n2. 蔵書データの表示 \n9. 終了\n番号を選んでください(0, 1, 2, 9): "
@@ -148,6 +159,8 @@ class BookInfoManager
     end
 end
 
+# 引数は指定せず、BookInfoManagerのインスタンスを作成。デフォルトのyamlファイルのパスを読み込む
 book_info_manager = BookInfoManager.new
+# メニュー選択画面
 book_info_manager.run
 
