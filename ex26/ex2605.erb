@@ -1,0 +1,24 @@
+<%# coding: utf-8 %>
+<% require 'yaml' %>
+<% require 'active_record' %>
+<% require './product' %>
+
+<%# データベースに接続する %>
+<% config = YAML.load_file('../../mysql_cn/database.yml') %>
+<% ActiveRecord::Base.establish_connection(config['db']['sample']) %>
+
+<%# テーブルからデータを読み込んで表示する %>
+<html><head><meta charset='UTF-8'></head><body>
+<%# データを1件ずつ取り出して処理する %>
+<% (Product.first.id..Product.last.id).each do |id| %>
+<ul>
+    <li><%= "id: #{Product.find_by(id: id).id}" %></li>
+    <li><%= "title: #{Product.find_by(id: id).title}" %></li>
+    <li><%= "description: #{Product.find_by(id: id).description}" %></li>
+    <li><%= "image_url: #{Product.find_by(id: id).image_url}" %></li>
+    <li><%= "price: #{Product.find_by(id: id).price}" %></li>
+    <li><%= "date_available: #{Product.find_by(id: id).date_available}" %></li>
+    <hr>
+</ul>
+<% end %>
+</body></html>
