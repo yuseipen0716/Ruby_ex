@@ -1,0 +1,22 @@
+<%# coding: utf-8 %>
+% require 'yaml'
+% require 'active_record'
+
+% class Product < ActiveRecord::Base
+% end
+
+%# データベースに接続する
+% config = YAML.load_file('../../mysql_cn/database.yml')
+% ActiveRecord::Base.establish_connection(config['db']['sample'])
+
+%# データベースに格納されている情報を1件ずつ取り出して表示
+% (Product.first.id..Product.last.id).each do |id|
+<ul>
+    <li><%= "id: #{Product.find_by(id: id).id}" %></li>
+    <li><%= "title: #{Product.find_by(id: id).title}" %></li>
+    <li><%= "description: #{Product.find_by(id: id).description}" %></li>
+    <li><%= "image_url: #{Product.find_by(id: id).image_url}" %></li>
+    <li><%= "price: #{Product.find_by(id: id).price}" %></li>
+    <li><%= "date_available: #{Product.find_by(id: id).date_available}" %></li>
+</ul>
+% end
