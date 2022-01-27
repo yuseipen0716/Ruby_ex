@@ -35,20 +35,20 @@
 <%# テーブルの項目名を取り出して、表の項目行を表示する %>
     <tr>
         <th>削除</th><th>修正</th>
-        <% (0..Bookinfo.column_names.size-1).each do |column| %>
-            <th><%=  "#{Bookinfo.column_names[column]}" %></th>
+        <% Bookinfo.column_names.each do |column_name| %>
+            <th><%=  "#{column_name}" %></th>
         <% end %>
     </tr>
 <%# select文の実行結果を1件ずつ取り出して繰り返し処理 %>
-<% (Bookinfo.first.id..Bookinfo.last.id).each do |id| %>
+<% Bookinfo.all.each do |bookinfo| %>
     <tr>
-    <% (0..Bookinfo.find_by(id: id).attributes.size-1).each do |column| %>
+    <% (0..bookinfo.attributes.size-1).each do |column| %>
         <% if column == 0 %>
             <%# valueに選択したidの値の後に処理(.delete, .edit)を結合した文字列を設定 %>
-            <td><input type='radio' name='operation' value=<%="#{Bookinfo.find_by(id: id).id}.delete"%> /></td>
-            <td><input type='radio' name='operation' value=<%="#{Bookinfo.find_by(id: id).id}.edit"%> /></td>
+            <td><input type='radio' name='operation' value=<%="#{bookinfo.id}.delete"%> /></td>
+            <td><input type='radio' name='operation' value=<%="#{bookinfo.id}.edit"%> /></td>
         <% end %>
-        <td><%= "#{Bookinfo.find_by(id: id).attributes.values[column].to_s}" %></td>
+        <td><%= "#{bookinfo.attributes.values[column].to_s}" %></td>
     <% end %>
     </tr>
 <% end %>
