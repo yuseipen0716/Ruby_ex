@@ -25,7 +25,7 @@ server.config[:MimeTypes]['erb'] = 'text/html'
 server.mount_proc('/list') do |req, res|
     p req.query
     # 'operation'の値の後の(.delete, .edit)で処理を分岐する
-    if /(.*)\.(delete|edit)$/ =~ req.query('operation')
+    if /(.*)\.(delete|edit)$/ =~ req.query['operation']
         target_id = $1
         operation = $2
         # 選択された処理を実行する画面に移行する
