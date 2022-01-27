@@ -20,7 +20,8 @@ server = WEBrick::HTTPServer.new(config)
 # erbのMIMEタイプを設定
 server.config[:MimeTypes]['erb'] = 'text/html'
 
-# 一覧表示からの処理
+
+# ==========  一覧表示からの処理 ========== 
 # 'http://localhost:8099/list'で呼び出される。
 server.mount_proc('/list') do |req, res|
     p req.query
@@ -41,6 +42,9 @@ server.mount_proc('/list') do |req, res|
         res.body << template.result(binding)
     end
 end
+
+
+# ==========  登録の処理 ========== 
 
 
 # Ctrl-C割り込みがあった場合にサーバーを停止する処理を登録しておく
