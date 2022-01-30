@@ -62,8 +62,10 @@ server.mount_proc('/entry') do |req, res|
     # 入力されたidをid_checkerに格納して、下記のif文でデータベースにそのidが存在するか評価
     id_checker = req.query['id']
     if id_checker
-        puts '入力されたidは使用されています。'
-        return
+        # 処理の結果を表示する
+        # ERBをERBHandlerを経由せずに直接呼び出して利用している
+        template = ERB.new(File.read('noentried.erb'))
+        res.body << template.result(binding)
     else # id_checkerがnilなら登録作業を実施
         Bookinfo.create(
             id: req.query['id'],
