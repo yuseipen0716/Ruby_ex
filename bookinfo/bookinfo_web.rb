@@ -14,6 +14,7 @@ end
 config = {
     :Port => 8099,
     :DocumentRoot => '.',
+    :CGIInterpreter => '/usr/bin/ruby-Eutf-8:utf-8'
 }
 
 # 拡張子erbのファイルを、ERBを呼び出して処理するERBHandlerと関連づける
@@ -60,7 +61,8 @@ server.mount_proc('/entry') do |req, res|
 
     # idが使用されていた場合は登録できないようにする
     # 入力されたidをid_checkerに格納して、下記のif文でデータベースにそのidが存在するか評価
-    id_checker = req.query['id']
+    input_id = req.query['id']
+    id_checker = Bookinfo.find_by(id: input_id)
     if id_checker
         # 処理の結果を表示する
         # ERBをERBHandlerを経由せずに直接呼び出して利用している
@@ -68,19 +70,17 @@ server.mount_proc('/entry') do |req, res|
         res.body << template.result(binding)
     else # id_checkerがnilなら登録作業を実施
         Bookinfo.create(
-            id: req.query['id'],
-            title: req.query['title'],
-            author: req.query['author'],
-            page: req.query['page'],
-            publish_date: req.query['publish_date']
+            id: req.query['id'].force_encoding('utf-8'),
+            title: req.query['title'].force_encoding('utf-8'),
+            author: req.query['author'].force_encoding('utf-8'),
+            page: req.query['page'].force_encoding('utf-8'),
+            publish_date: req.query['publish_date'].force_encoding('utf-8')
         );
+        # 処理の結果を表示する
+        # ERBをERBHandlerを経由せずに直接呼び出して利用している
+        template = ERB.new(File.read('entried.erb'))
+        res.body << template.result(binding)
     end
-
-    # 処理の結果を表示する
-    # ERBをERBHandlerを経由せずに直接呼び出して利用している
-    template = ERB.new(File.read('entried.erb'))
-    res.body << template.result(binding)
-
 end
 
 

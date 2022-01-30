@@ -60,3 +60,11 @@ end
 #     <% end %>
 #     </tr>
 # <% end %>
+
+# id = 2
+
+# check = Product.find_by(id: id)
+# p check
+# if check
+#     puts 'idが重複しています'
+# end
