@@ -30,6 +30,10 @@ Product.all.each do |product|
     end
     puts '---------------'
 end
+sql = ""
+p ActiveRecord::Base.connection.select_all(sql) if sql != ""
+
+puts '該当データはありません' if sql == ""
 
 # p Product.all
 

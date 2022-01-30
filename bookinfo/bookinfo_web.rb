@@ -84,6 +84,43 @@ server.mount_proc('/entry') do |req, res|
 end
 
 
+# ==========  検索の処理 ==========
+# 'http://localhost:8099/retrieve'で呼び出される
+server.mount_proc('/retrieve') do |req, res|
+    # 本来ならここで入力データに危険や不正がないかチェックするが、演習の見通しのために割愛している
+    p req.query
+
+    # 検索条件の整理
+    search_column = ['id', 'title', 'author', 'page', 'publish_date']
+    # 問い合わせ条件のある要素以外を削除
+    search_column.delete_if{|name| req.query[name] == ""}
+
+    if search_column.empty?
+        where_data = ""
+        sql = where_data
+    else
+        # 残った要素を検索条件文字列に変換
+        search_column.map!{|name| "#{name}='#{req.query[name]}'"}
+        where_data = "where " + search_column.join(' or ')
+        
+        sql = "select * from bookinfos #{where_data};"
+        p sql
+        # where_data.each do |i|
+        #     p i
+        # end
+        # データベースに接続する
+        # config = YAML.load_file('../../mysql_cn/database.yml')
+        # ActiveRecord::Base.establish_connection(config['db']['bookinfos'])
+        # p ActiveRecord::Base.connection.select_all("select * from bookinfos #{where_data};")
+    end
+    
+    # 処理の結果を表示する
+    # ERBをERBHandlerを経由せずに直接呼び出して利用している
+    template = ERB.new(File.read('retrieved.erb'))
+    res.body << template.result(binding)
+end
+
+
 
 # Ctrl-C割り込みがあった場合にサーバーを停止する処理を登録しておく
 trap(:INT) do

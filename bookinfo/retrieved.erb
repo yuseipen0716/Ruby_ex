@@ -1,0 +1,77 @@
+<%# coding:utf-8 %>
+
+<% require 'yaml' %>
+<% require 'active_record' %>
+<% require './class_bookinfo.rb' %>
+
+<%# データベースに接続する %>
+<% config = YAML.load_file('../../mysql_cn/database.yml') %>
+<% ActiveRecord::Base.establish_connection(config['db']['bookinfos']) %>
+
+<%# 該当するレコードを配列に収集する %>
+<% rows = ActiveRecord::Base.connection.select_all(sql) if sql != "" %> 
+
+<%# テーブルからデータを読み込んで結果のセットを得る %>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- リセットCSS -->
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+    <!-- CSSファイル読み込み -->
+    <link rel="stylesheet" href="./stylesheet.css">
+    <title>蔵書管理</title>
+</head>
+<body>
+<h1>蔵書管理</h1>
+
+<% if sql == "" %>
+<%# 検索結果がないとき %>
+<h2>該当データがありません</h2>
+<p>検索条件を見直してから実行してください |
+<a href='list.erb'>蔵書データの表示</a> |
+<a href='index.html'>メニュー画面に戻る</a></p>
+
+<% else %>
+<%# 検索結果があったとき %>
+<h2>検索結果の表示</h2>
+<p>処理する蔵書データを選択してください |
+<a href='list.erb'>蔵書データの表示(検索の解除)</a> |
+<a href='index.html'>メニュー画面に戻る</a></p>
+<hr>
+<%# p rows %>
+<%# 修正データを表示する。アクションはlist %>
+<form method='pots' action='list'>
+
+<%# テーブルの項目名を取り出して表の項目行を表示する %>
+<table>
+    <tr>
+        <th>削除</th><th>修正</th>
+        <% Bookinfo.column_names.each do |column_name| %>
+            <th><%=  "#{column_name}" %></th>
+        <% end %>
+    </tr>
+<%# select文の実行結果を1件ずつ取り出して繰り返し処理 %>
+<% rows.each do |row| %>
+    <tr>
+    <%# rowsはselect文の結果のハッシュが配列に格納されている状態（たぶん） %>
+    <%# 外側の繰り返しgではそれぞれのハッシュを取り出す %>
+    <% row.values.each do |value| %>
+        <%# 内側の繰り返しではハッシュのvalueを配列に格納したものから、それぞれのvalueを取り出す %>
+        <%# idのカラムより前の削除、修正の部分にラジオボタンを当てたいので、ifの条件は取り出したvalueのインデックス番号が0のときとした %>
+        <% if row.values.index(value) == 0  %>
+            <%# valueに選択したidの値の後に処理(.delete, .edit)を結合した文字列を設定 %>
+            <td><input type='radio' name='operation' value=<%="#{value}.delete"%> /></td>
+            <td><input type='radio' name='operation' value=<%="#{value}.edit"%> /></td>
+        <% end %>
+        <td><%= "#{value.to_s}" %></td>
+    <% end %>
+    </tr>
+<% end %>
+</table>
+<input type='submit' value='選択した処理を実行' />
+<% end %>
+<hr>
+</body>
+</html>
