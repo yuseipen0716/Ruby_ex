@@ -120,6 +120,27 @@ server.mount_proc('/retrieve') do |req, res|
     res.body << template.result(binding)
 end
 
+# ==========  修正の処理 ========== 
+# 'http://localhost:8099/edit'で呼び出される
+server.mount_proc('/edit') do |req, res|
+    # 本来ならここで入力データに危険や不正がないかチェックするが、演習の見通しのために割愛している
+    p req.query
+    # データベースに接続する
+    config = YAML.load_file('../../mysql_cn/database.yml')
+    ActiveRecord::Base.establish_connection(config['db']['bookinfos'])
+
+    # テーブルのデータを更新する
+    sql = "update bookinfos set id='#{req.query['id']}', title='#{req.query['title']}', 
+    author='#{req.query['author']}', page='#{req.query['page']}', publish_date='#{req.query['publish_date'].gsub(/[a-zA-Z]/,'')}' where id='#{req.query['id']}';"
+    ActiveRecord::Base.connection.execute(sql)
+    p Bookinfo.find_by(id: req.query['id'].to_i)
+
+    # 処理の結果を表示する
+    # ERBをERBHandlerを経由せずに直接呼び出して利用している
+    template = ERB.new(File.read('edited.erb'))
+    res.body << template.result(binding)
+end
+
 
 
 # Ctrl-C割り込みがあった場合にサーバーを停止する処理を登録しておく
