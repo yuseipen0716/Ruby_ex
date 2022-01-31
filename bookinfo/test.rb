@@ -35,6 +35,9 @@ p ActiveRecord::Base.connection.select_all(sql) if sql != ""
 
 puts '該当データはありません' if sql == ""
 
+p Product.find_by(id: 1).attributes[0].key
+
+
 # p Product.all
 
 # <%# select文の実行結果を1件ずつ取り出して繰り返し処理 %>
