@@ -130,8 +130,9 @@ server.mount_proc('/edit') do |req, res|
     ActiveRecord::Base.establish_connection(config['db']['bookinfos'])
 
     # テーブルのデータを更新する
-    sql = "update bookinfos set id='#{req.query['id']}', title='#{req.query['title']}', 
-    author='#{req.query['author']}', page='#{req.query['page']}', publish_date='#{req.query['publish_date'].gsub(/[a-zA-Z]/,'')}' where id='#{req.query['id']}';"
+    sql = "update bookinfos set id='#{req.query['id'].force_encoding('utf-8')}', title='#{req.query['title'].force_encoding('utf-8')}', 
+    author='#{req.query['author'].force_encoding('utf-8')}', page='#{req.query['page'].force_encoding('utf-8')}', 
+    publish_date='#{req.query['publish_date'].gsub(/[a-zA-Z]/,'').force_encoding('utf-8')}' where id='#{req.query['id']}';"
     ActiveRecord::Base.connection.execute(sql)
     p Bookinfo.find_by(id: req.query['id'].to_i)
 
