@@ -134,11 +134,29 @@ server.mount_proc('/edit') do |req, res|
     author='#{req.query['author'].force_encoding('utf-8')}', page='#{req.query['page'].force_encoding('utf-8')}', 
     publish_date='#{req.query['publish_date'].gsub(/[a-zA-Z]/,'').force_encoding('utf-8')}' where id='#{req.query['id']}';"
     ActiveRecord::Base.connection.execute(sql)
-    p Bookinfo.find_by(id: req.query['id'].to_i)
+    # p Bookinfo.find_by(id: req.query['id'].to_i) デバッグ用
 
     # 処理の結果を表示する
     # ERBをERBHandlerを経由せずに直接呼び出して利用している
     template = ERB.new(File.read('edited.erb'))
+    res.body << template.result(binding)
+end
+
+# ==========  削除の処理 ==========
+# 'http://localhost:8099/delete'で呼び出される
+server.mount_proc('/delete') do |req, res|
+    # 本来ならここで入力データに危険や不正がないかチェックするが、演習の見通しのために割愛している
+    p req.query
+    # データベースに接続する
+    config = YAML.load_file('../../mysql_cn/database.yml')
+    ActiveRecord::Base.establish_connection(config['db']['bookinfos'])
+
+    # テーブルからデータを削除する
+    Bookinfo.destroy_by(id: req.query['id'].to_i)
+
+    # 処理の結果を表示する
+    # ERBをERBHandlerを経由せずに直接呼び出して利用している
+    template = ERB.new(File.read('deleted.erb'))
     res.body << template.result(binding)
 end
 

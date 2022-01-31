@@ -1,0 +1,53 @@
+<%# coding:utf-8 %>
+
+<% require 'yaml' %>
+<% require 'active_record' %>
+<% require './class_bookinfo.rb' %>
+
+<%# データベースに接続する %>
+<% config = YAML.load_file('../../mysql_cn/database.yml') %>
+<% ActiveRecord::Base.establish_connection(config['db']['bookinfos']) %>
+
+<%# テーブルから削除対象のデータを読み込む %>
+<% target_of_delete = Bookinfo.find_by(id: target_id).attributes %> 
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- リセットCSS -->
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+    <!-- CSSファイル読み込み -->
+    <link rel="stylesheet" href="./stylesheet.css">
+    <title>蔵書管理</title>
+</head>
+<body>
+<h1>蔵書管理</h1>
+<h2>蔵書データの削除</h2>
+<p>このデータを削除します | 
+<a href='list.erb'>蔵書データの表示</a> |
+<a href='index.html'>メニュー画面に戻る</a></p>
+<hr>
+
+<%# 修正データを表示する アクションはdelete %>
+<form method='post' action='delete'>
+<input type='hidden' name='id' value="<%= target_id %>" />
+<table>
+<%# select文の実行結果のidが指定されたデータを取り出し、繰り返し処理する %>
+    <th>項目名</th><th>修正データ</th>
+<%# target_of_editはtarget_idから検索して出てきたレコードがハッシュになっているので %>
+<%# ハッシュからkeyを取り出して繰り返し %>
+<% target_of_delete.keys.each do |key| %>
+    <tr>
+        <td><%= key %></td>
+        <%# valueのところはtarget_of_delete[key]として取り出したkeyに対応するvalueを表示 %>
+        <td><input name="<%= key %>" value="<%= target_of_delete[key] %>" size='60' /></td>
+    </tr>
+<% end %>
+</table>
+<input type='submit' value='修正を実行' />
+</form>
+<hr>
+</body>
+</html>
