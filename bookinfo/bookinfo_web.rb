@@ -157,7 +157,7 @@ server.mount_proc('/delete') do |req, res|
     # 処理の結果を表示する
     # ERBをERBHandlerを経由せずに直接呼び出して利用している
     template = ERB.new(File.read('deleted.erb'))
-    res.body << template.result(binding)
+    res.body << template.result(binding).force_encoding('utf-8') # encordingでエラーが出たので
 end
 
 
